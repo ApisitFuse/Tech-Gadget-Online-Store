@@ -1,10 +1,14 @@
 import logo from "./logo.svg";
 import "./App.css";
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./tailwind.css";
 
 function App() {
   const [data, setData] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true); // สร้าง state สำหรับแสดงการโหลด
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // เรียก API ไปที่ backend
@@ -12,7 +16,28 @@ function App() {
       .then((response) => response.json())
       .then((data) => setData(data.message))
       .catch((error) => console.error("Error fetching data:", error));
+
+    axios
+      .get("http://localhost:8000/users")
+      .then((response) => {
+        setUsers(response.data); // เก็บข้อมูล users ใน state
+        setLoading(false); // ปิดสถานะการโหลด
+      })
+      .catch((err) => {
+        setError(err); // เก็บข้อผิดพลาดใน state
+        setLoading(false); // ปิดสถานะการโหลด
+      });
   }, []);
+
+  // ถ้าอยู่ในสถานะการโหลด
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  // ถ้ามีข้อผิดพลาดในการดึงข้อมูล
+  if (error) {
+    return <p>Error: {error.message}</p>;
+  }
 
   return (
     <div className="App">
@@ -45,6 +70,17 @@ function App() {
             Click Me
           </button>
         </div>
+      </div>
+
+      <div>
+        <h1>List of Users</h1>
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              {user.username} - {user.email}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
