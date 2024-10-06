@@ -1,89 +1,75 @@
-import logo from "./logo.svg";
-import "./App.css";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Register from './login/Register';
+import Login from './login/Login';
+import Profile from './user/Profile';
+import Home from './general/Home';
+import Navigation from './layout/Navigation';
 import "./tailwind.css";
 
-function App() {
-  const [data, setData] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true); // สร้าง state สำหรับแสดงการโหลด
-  const [error, setError] = useState(null);
 
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // ตรวจสอบการ login ทุกครั้งที่ component นี้ render
   useEffect(() => {
-    // เรียก API ไปที่ backend
-    fetch("http://localhost:8000/api/data")
-      .then((response) => response.json())
-      .then((data) => setData(data.message))
-      .catch((error) => console.error("Error fetching data:", error));
+    const token = localStorage.getItem('token');
+    console.log("useEffect");
+    if (token) {
+      setIsLoggedIn(true); // ถ้ามี token ให้ถือว่าผู้ใช้ login อยู่
+    }
+  }, []); // เช็คแค่ครั้งแรกที่ component mount
 
-    axios
-      .get("http://localhost:8000/users")
-      .then((response) => {
-        setUsers(response.data); // เก็บข้อมูล users ใน state
-        setLoading(false); // ปิดสถานะการโหลด
-      })
-      .catch((err) => {
-        setError(err); // เก็บข้อผิดพลาดใน state
-        setLoading(false); // ปิดสถานะการโหลด
-      });
-  }, []);
-
-  // ถ้าอยู่ในสถานะการโหลด
-  if (loading) {
-    return <p>Loading...</p>;
-  }
-
-  // ถ้ามีข้อผิดพลาดในการดึงข้อมูล
-  if (error) {
-    return <p>Error: {error.message}</p>;
-  }
-
+  // const isLoggedIn = !!localStorage.getItem('token'); // ตรวจสอบสถานะการ Login
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <p>{data ? data : "Loading data..."}</p>
-      </header>
-
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <div className="max-w-sm p-6 mx-auto bg-white rounded-xl shadow-lg space-y-4">
-          <h1 className="text-3xl font-bold text-blue-600">
-            Tailwind CSS Test
-          </h1>
-          <p className="text-gray-7000">
-            This is a test to ensure that Tailwind CSS is working correctly in
-            your project.
-          </p>
-          <button className="px-4 py-2 font-semibold text-white bg-blue-500 rounded hover:bg-blue-600">
-            Click Me
-          </button>
-        </div>
-      </div>
-
-      <div>
-        <h1>List of Users</h1>
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              {user.username} - {user.email}
+    <Router>
+      <div className="min-h-screen bg-gray-100">
+        {/* <nav className="bg-blue-600 p-4 shadow-md">
+          <ul className="flex justify-center space-x-6">
+            <li>
+              <Link
+                to="/register"
+                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
+              >
+                Register
+              </Link>
             </li>
-          ))}
-        </ul>
+            <li>
+              <Link
+                to="/login"
+                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
+              >
+                Login
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profile"
+                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
+              >
+                Profile
+              </Link>
+            </li>
+            {isLoggedIn && (
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200"
+              >
+                Logout
+              </button>
+            )}
+          </ul>
+        </nav> */}
+        <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/profile" element={<Profile />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
-}
+};
 
 export default App;
