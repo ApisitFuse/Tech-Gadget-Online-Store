@@ -2,7 +2,7 @@ const { Model, DataTypes } = require("sequelize");
 const { Product } = require("./Product");
 const { Payment } = require("./Payment");
 const { User } = require("./UserLogin");
-const sequelize = require("../config/database");
+const sequelize = require("../config/Database");
 
 
 class Cart extends Model { }

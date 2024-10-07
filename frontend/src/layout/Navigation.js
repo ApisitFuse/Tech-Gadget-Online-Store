@@ -13,7 +13,9 @@ const Navigation = ({ isLoggedIn, setIsLoggedIn }) => {
   return (
     <nav className="bg-blue-600 p-4 shadow-md">
       <ul className="flex justify-center space-x-6">
-
+        <li>
+          <Link to="/" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Home</Link>
+        </li>
         {!isLoggedIn && (
           <>
             <li>

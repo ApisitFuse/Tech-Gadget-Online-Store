@@ -1,10 +1,10 @@
 const { Model, DataTypes } = require("sequelize");
-const {User} = require("./UserLogin");
-const {Product} = require("./Product");
-const sequelize = require("../config/database");
+const { User } = require("./UserLogin");
+const { Product } = require("./Product");
+const sequelize = require("../config/Database");
 
 
-class Wishlist extends Model {}
+class Wishlist extends Model { }
 
 Wishlist.init({
   userId: {
@@ -24,7 +24,7 @@ Wishlist.init({
   schema: 'tech_gadget_online_store',
 });
 
-class WishlistProduct extends Model {}
+class WishlistProduct extends Model { }
 
 WishlistProduct.init({
   wishlistId: {
@@ -61,4 +61,4 @@ Wishlist.belongsTo(User, { foreignKey: 'userId' });
 Wishlist.belongsToMany(Product, { through: WishlistProduct, foreignKey: 'wishlistId' });
 Product.belongsToMany(Wishlist, { through: WishlistProduct, foreignKey: 'productId' });
 
-module.exports = {Wishlist, WishlistProduct};
+module.exports = { Wishlist, WishlistProduct };

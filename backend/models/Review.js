@@ -1,10 +1,10 @@
 const { Model, DataTypes } = require("sequelize");
-const {User} = require("./UserLogin");
-const {Product} = require("./Product");
-const sequelize = require("../config/database");
+const { User } = require("./UserLogin");
+const { Product } = require("./Product");
+const sequelize = require("../config/Database");
 
 
-class Review extends Model {}
+class Review extends Model { }
 
 Review.init({
   point: {
@@ -53,4 +53,4 @@ Review.belongsTo(User, { foreignKey: 'userId' });
 Product.hasMany(Review, { foreignKey: 'productId' });
 Review.belongsTo(Product, { foreignKey: 'productId' });
 
-module.exports = {Review};
+module.exports = { Review };

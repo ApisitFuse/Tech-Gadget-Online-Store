@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchLoginAPI } from '../services/authenticationService';
+import { fetchLoginAPI } from '../services/AuthenticationService';
 
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ const Login = ({ setIsLoggedIn }) => {
       console.error('Error logging in user:', error);
       setMessage('Error occurred');
     }
-    
+
     // try {
     //   const response = await fetchLoginAPI(email, password);
     //   // const response = await fetch('http://localhost:8000/api/auth/login', {
@@ -53,7 +53,7 @@ const Login = ({ setIsLoggedIn }) => {
     //   console.error('Error logging in user:', error);
     //   setMessage('Error occurred');
     // }
-    
+
   };
 
   return (

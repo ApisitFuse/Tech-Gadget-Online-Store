@@ -1,10 +1,10 @@
 const { Model, DataTypes } = require("sequelize");
 const { User } = require("./UserLogin");
 const { Product } = require("./Product");
-const sequelize = require("../config/database");
+const sequelize = require("../config/Database");
 
 
-class Search extends Model {}
+class Search extends Model { }
 
 Search.init(
   {
@@ -32,7 +32,7 @@ Search.init(
 
 );
 
-class Recomment extends Model {}
+class Recomment extends Model { }
 
 Recomment.init(
   {

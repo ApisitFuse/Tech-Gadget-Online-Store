@@ -1,8 +1,8 @@
 const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
+const sequelize = require("../config/Database");
 const { User, Address, Delivery_status } = require("./UserLogin");
 
-class Payment_method extends Model {}
+class Payment_method extends Model { }
 
 Payment_method.init(
   {
@@ -19,7 +19,7 @@ Payment_method.init(
   }
 );
 
-class Payment extends Model {}
+class Payment extends Model { }
 
 Payment.init(
   {
@@ -56,7 +56,7 @@ Payment.init(
   }
 );
 
-class Receipt extends Model {}
+class Receipt extends Model { }
 
 Receipt.init(
   {
@@ -117,7 +117,7 @@ Receipt.init(
 
 );
 
-class User_history extends Model {}
+class User_history extends Model { }
 
 User_history.init({
   UHID: {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ใช้ navigate เพื่อเปลี่ยนเส้นทาง
+import { fetchRegisterAPI } from '../services/AuthenticationService';
 
 const Register = ({ setIsLoggedIn }) => {
     const [GID, setGID] = useState('');
@@ -14,21 +15,12 @@ const Register = ({ setIsLoggedIn }) => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:8000/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ GID, glocbalName, email, password, roleId }),
-            });
+            const response = await fetchRegisterAPI(GID, glocbalName, email, password, roleId);
 
-            if (response.ok) {
-                const data = await response.json();
+            if (response) {
                 setMessage('Registration successful!');
-                localStorage.setItem('token', data.token); // เก็บ token ใน localStorage
-
+                localStorage.setItem('token', response.token); // เก็บ token ใน localStorage
                 setIsLoggedIn(true); // อัปเดตสถานะการ login
-                // หลังจากเก็บ token ให้ redirect ผู้ใช้ไปยังหน้าโปรไฟล์
                 navigate('/profile');
             } else {
                 setMessage('Registration failed');
@@ -37,6 +29,29 @@ const Register = ({ setIsLoggedIn }) => {
             console.error('Error registering user:', error);
             setMessage('Error occurred');
         }
+
+        // try {
+        //     const response = await fetch('http://localhost:8000/api/auth/register', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify({ GID, glocbalName, email, password, roleId }),
+        //     });
+
+        //     if (response.ok) {
+        //         const data = await response.json();
+        //         setMessage('Registration successful!');
+        //         localStorage.setItem('token', data.token); // เก็บ token ใน localStorage
+        //         setIsLoggedIn(true); // อัปเดตสถานะการ login
+        //         navigate('/profile');
+        //     } else {
+        //         setMessage('Registration failed');
+        //     }
+        // } catch (error) {
+        //     console.error('Error registering user:', error);
+        //     setMessage('Error occurred');
+        // }
     };
 
     return (
@@ -94,7 +109,7 @@ const Register = ({ setIsLoggedIn }) => {
                 {message && <p className="text-red-500 text-center mt-4">{message}</p>}
             </div>
         </div>
-        
+
     );
 };
 

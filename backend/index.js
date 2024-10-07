@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./config/database");
+const sequelize = require("./config/Database");
 const { User, Role, Delivery_status, Address, Gender, Registration, Status } = require("./models/UserLogin");
 const { Product, Category, Promotion_type, Promotion, ProductPromotion, CategoryProduct } = require("./models/Product");
 const { Cart } = require("./models/Shopping");
@@ -9,14 +9,16 @@ const { Payment, Receipt, Payment_method, User_history } = require("./models/Pay
 const { Review } = require("./models/Review");
 const { Order } = require("./models/Admin");
 const { Search, Recomment } = require("./models/RecommentSearch");
-const authRoutes = require('./controllers/auth');
-const seedData = require('./seedData/seed');
+const authRoutes = require('./controllers/Authenticate');
+const seedData = require('./seedData/Seed');
 const bodyParser = require('body-parser');
 
 require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 8000;
+const HOST = process.env.BN_HOST;
+const B_PORT = process.env.BN_PORT;
+const F_PORT = process.env.FN_PORT;
 
 // JSON to JavaScript object
 app.use(express.json());
@@ -24,7 +26,7 @@ app.use(express.json());
 // CORS setup
 app.use(
   cors({
-    origin: "http://localhost:3000", // ที่อยู่ของ frontend
+    origin: `http://${HOST}}:${F_PORT}`, // ที่อยู่ของ frontend
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
@@ -72,8 +74,8 @@ const startServer = async () => {
 // เริ่มเซิร์ฟ เกี่ยวกับการสร้างตาราง
 // startServer();
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(B_PORT, () => {
+  console.log(`Server is running on http://localhost:${B_PORT}`);
 });
 
 // const express = require("express");
