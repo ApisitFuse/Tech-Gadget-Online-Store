@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { fetchProfileAPI } from '../services/User';
 
 const Profile = () => {
     const [profile, setProfile] = useState(null);
@@ -6,15 +7,16 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            const token = localStorage.getItem('token');
-            console.log(token)
+            // const token = localStorage.getItem('token');
             try {
-                const response = await fetch('http://localhost:8000/api/auth/profile', {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`, // เพิ่ม 'Bearer ' ก่อน token
-                    },
-                });
+                const response = await fetchProfileAPI();
+                // const response = await fetch('http://localhost:8000/api/user/profile', {
+                //     method: 'GET',
+                //     credentials: 'include',
+                //     // headers: {
+                //     //     'Authorization': `Bearer ${token}`, // เพิ่ม 'Bearer ' ก่อน token
+                //     // },
+                // });
 
                 if (response.ok) {
                     const data = await response.json(); // แก้เป็น .json() แทน .text()

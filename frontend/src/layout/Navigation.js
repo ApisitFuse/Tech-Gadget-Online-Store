@@ -1,11 +1,18 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { fetchLogoutAPI } from '../services/authenticationService';
 
 const Navigation = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    // localStorage.removeItem('token');
+    const response = await fetchLogoutAPI();
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
     setIsLoggedIn(false);
     navigate('/login');
   };

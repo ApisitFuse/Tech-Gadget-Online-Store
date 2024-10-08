@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchLoginAPI } from '../services/AuthenticationService';
+import { fetchLoginAPI } from '../services/authenticationService';
 
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
@@ -17,7 +17,6 @@ const Login = ({ setIsLoggedIn }) => {
 
       if (response) {  // ตรวจสอบว่า response ถูกส่งคืนอย่างถูกต้อง
         setMessage('Login successful!');
-        localStorage.setItem('token', response.token);
         setIsLoggedIn(true);
         navigate('/profile');
       } else {
@@ -87,27 +86,6 @@ const Login = ({ setIsLoggedIn }) => {
         {message && <p className="text-red-500 text-center mt-4">{message}</p>}
       </div>
     </div>
-    // <div>
-    //   <h2>Login</h2>
-    //   <form onSubmit={handleLogin}>
-    //     <input
-    //       type="email"
-    //       placeholder="Email"
-    //       value={email}
-    //       onChange={(e) => setEmail(e.target.value)}
-    //       required
-    //     />
-    //     <input
-    //       type="password"
-    //       placeholder="Password"
-    //       value={password}
-    //       onChange={(e) => setPassword(e.target.value)}
-    //       required
-    //     />
-    //     <button type="submit">Login</button>
-    //   </form>
-    //   {message && <p>{message}</p>}
-    // </div>
   );
 };
 

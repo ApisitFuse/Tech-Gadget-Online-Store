@@ -10,8 +10,10 @@ const { Review } = require("./models/Review");
 const { Order } = require("./models/Admin");
 const { Search, Recomment } = require("./models/RecommentSearch");
 const authRoutes = require('./controllers/Authenticate');
+const userRoutes = require('./controllers/User');
 const seedData = require('./seedData/Seed');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 require("dotenv").config();
 
@@ -22,19 +24,21 @@ const F_PORT = process.env.FN_PORT;
 
 // JSON to JavaScript object
 app.use(express.json());
+app.use(cookieParser());
 
 // CORS setup
 app.use(
   cors({
-    origin: `http://${HOST}}:${F_PORT}`, // ที่อยู่ของ frontend
+    origin: `http://${HOST}:${F_PORT}`, // ที่อยู่ของ frontend
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 // Middleware ให้บริการไฟล์จากโฟลเดอร์ uploads
 app.use('/uploads', express.static('uploads'));
 
