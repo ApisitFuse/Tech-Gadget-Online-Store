@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ใช้ navigate เพื่อเปลี่ยนเส้นทาง
-import { fetchRegisterAPI } from '../services/AuthenticationService';
+import { fetchRegisterAPI } from '../services/authenticationService';
 
 const Register = ({ setIsLoggedIn }) => {
     const [GID, setGID] = useState('');
@@ -19,7 +19,6 @@ const Register = ({ setIsLoggedIn }) => {
 
             if (response) {
                 setMessage('Registration successful!');
-                localStorage.setItem('token', response.token); // เก็บ token ใน localStorage
                 setIsLoggedIn(true); // อัปเดตสถานะการ login
                 navigate('/profile');
             } else {
