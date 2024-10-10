@@ -52,21 +52,21 @@ const seedData = async () => {
     const registrations = [
       {
         GID: 'GID001',
-        glocbalName: 'John Doe',
+        globalName: 'John Doe',
         email: 'john@example.com',
         password: await bcrypt.hash('password123', 10),
         roleId: 1,
       },
       {
         GID: 'GID002',
-        glocbalName: 'Jane Doe',
+        globalName: 'Jane Doe',
         email: 'jane@example.com',
         password: await bcrypt.hash('password456', 10),
         roleId: 2,
       },
       {
         GID: 'GID003',
-        glocbalName: 'Alex Smith',
+        globalName: 'Alex Smith',
         email: 'alex@example.com',
         password: await bcrypt.hash('password789', 10),
         roleId: 1,

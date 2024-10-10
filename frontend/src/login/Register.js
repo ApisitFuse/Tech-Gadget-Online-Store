@@ -4,7 +4,7 @@ import { fetchRegisterAPI } from '../services/authenticationService';
 
 const Register = ({ setIsLoggedIn }) => {
     const [GID, setGID] = useState('');
-    const [glocbalName, setGlocbalName] = useState('');
+    const [globalName, setGlobalName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [roleId, setRoleId] = useState('');
@@ -15,7 +15,7 @@ const Register = ({ setIsLoggedIn }) => {
         e.preventDefault();
 
         try {
-            const response = await fetchRegisterAPI(GID, glocbalName, email, password, roleId);
+            const response = await fetchRegisterAPI(GID, globalName, email, password, roleId);
 
             if (response) {
                 setMessage('Registration successful!');
@@ -69,8 +69,8 @@ const Register = ({ setIsLoggedIn }) => {
                     <input
                         type="text"
                         placeholder="Global Name"
-                        value={glocbalName}
-                        onChange={(e) => setGlocbalName(e.target.value)}
+                        value={globalName}
+                        onChange={(e) => setGlobalName(e.target.value)}
                         required
                         className="w-full p-3 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

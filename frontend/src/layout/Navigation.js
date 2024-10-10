@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchLogoutAPI } from '../services/authenticationService';
+import RoleBasedComponent from '../layout/RoleBased';
 
-const Navigation = ({ isLoggedIn, setIsLoggedIn }) => {
+
+const Navigation = ({ isLoggedIn, setIsLoggedIn, userRole }) => {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    // localStorage.removeItem('token');
+
     const response = await fetchLogoutAPI();
 
     if (!response.ok) {
@@ -22,6 +24,17 @@ const Navigation = ({ isLoggedIn, setIsLoggedIn }) => {
       <ul className="flex justify-center space-x-6">
         <li>
           <Link to="/" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Home</Link>
+        </li>
+        <li>
+          <Link to="/super_admin" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Super Admin</Link>
+        </li>
+        <RoleBasedComponent allowedRoles={['Admin']} userRole={userRole}>
+          <li>
+            <Link to="/admin" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Admin</Link>
+          </li>
+        </RoleBasedComponent>
+        <li>
+          <Link to="/seller" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Seller</Link>
         </li>
         {!isLoggedIn && (
           <>

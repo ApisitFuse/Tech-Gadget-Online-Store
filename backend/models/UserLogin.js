@@ -73,7 +73,7 @@ Registration.init({
     type: DataTypes.STRING,
     allowNull: false,
   },
-  glocbalName: {
+  globalName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
