@@ -9,6 +9,7 @@ const Profile = () => {
         const fetchProfile = async () => {
             // const token = localStorage.getItem('token');
             try {
+
                 const response = await fetchProfileAPI();
                 // const response = await fetch('http://localhost:8000/api/user/profile', {
                 //     method: 'GET',
@@ -45,15 +46,15 @@ const Profile = () => {
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Name:</span>
-                            <span>{profile.glocbalName}</span>
+                            <span>{profile.globalName}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Email:</span>
                             <span>{profile.email}</span>
                         </div>
                         <div className="flex justify-between">
-                            <span className="font-semibold">Role ID:</span>
-                            <span>{profile.roleId}</span>
+                            <span className="font-semibold">Role:</span>
+                            <span>{profile.role}</span>
                         </div>
                         <div className="flex justify-between">
                             <span className="font-semibold">Created At:</span>

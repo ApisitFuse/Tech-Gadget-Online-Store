@@ -1,71 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Register from './login/Register';
 import Login from './login/Login';
 import Profile from './user/Profile';
 import Home from './general/Home';
 import Navigation from './layout/Navigation';
+import Unauthorized from './error/Unauthorized';
+import SuperAdmin from './super_admin/SuperAdmin';
+import Admin from './admin/Admin';
+import Seller from './seller/Seller';
+import { fetchCheckAuthAPI } from './services/authenticationService';
 import "./tailwind.css";
 
+// สร้าง PrivateRoute component เพื่อป้องกันการเข้าถึงเส้นทาง
+const PrivateRoute = ({ element: Component, allowedRoles, userRole }) => {
+  return allowedRoles.includes(userRole) ? (
+    Component
+  ) : (
+    <Navigate to="/unauthorized" replace />
+  );
+};
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState('');
+  const [authStatus, setAuthStatus] = useState(null);
+  // const navigate = useNavigate();
+
 
   // ตรวจสอบการ login ทุกครั้งที่ component นี้ render
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    console.log("useEffect");
-    if (token) {
-      setIsLoggedIn(true); // ถ้ามี token ให้ถือว่าผู้ใช้ login อยู่
-    }
-  }, []); // เช็คแค่ครั้งแรกที่ component mount
+    const checkAuth = async () => {
+      try {
+        const response = await fetchCheckAuthAPI();
 
-  // const isLoggedIn = !!localStorage.getItem('token'); // ตรวจสอบสถานะการ Login
+        if (response.status === 403) {
+          console.log("Access token expired, attempting to refresh...");
+          setAuthStatus(response.status);
+        } else {
+          const data = await response.json();
+          setUserRole(data.user.role);
+          if (data.isLoggedIn) {
+            setIsLoggedIn(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      }
+    };
+
+    checkAuth();
+  }, [isLoggedIn]); // ลบ isLoggedIn และ authStatus ออกจาก dependencies
+
+  // การนำทางถ้า authStatus เป็น 403
+  useEffect(() => {
+    if (authStatus === 403) {
+      console.log("authStatus", authStatus);
+      // navigate('/login'); // ใช้ navigate ที่นี่
+      // window.location.href = '/login';
+    }
+  }, [authStatus]);
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        {/* <nav className="bg-blue-600 p-4 shadow-md">
-          <ul className="flex justify-center space-x-6">
-            <li>
-              <Link
-                to="/register"
-                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
-              >
-                Register
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/login"
-                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
-              >
-                Login
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/profile"
-                className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300"
-              >
-                Profile
-              </Link>
-            </li>
-            {isLoggedIn && (
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200"
-              >
-                Logout
-              </button>
-            )}
-          </ul>
-        </nav> */}
-        <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+        <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} userRole={userRole} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
           <Route path="/profile" element={<Profile />} />
+
+          {/* ตัวอย่างการใช้ PrivateRoute กับหน้า Super Admin */}
+          <Route
+            path="/super_admin"
+            element={<PrivateRoute allowedRoles={['Super Admin']} userRole={userRole} element={<SuperAdmin />} />}
+          />
+          <Route
+            path="/admin"
+            element={<PrivateRoute allowedRoles={['Admin']} userRole={userRole} element={<Admin />} />}
+          />
+          <Route
+            path="/seller"
+            element={<PrivateRoute allowedRoles={['Seller']} userRole={userRole} element={<Seller />} />}
+          />
+
+          {/* หน้า Unauthorized สำหรับผู้ที่ไม่มีสิทธิ์ */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
+
+          {/* เส้นทางใด ๆ ที่ไม่ตรงกันจะเปลี่ยนไป Home */}
+          <Route path="*" element={<Navigate to="/" replace />} /> {/* ใส่ภายใน Route */}
         </Routes>
       </div>
     </Router>

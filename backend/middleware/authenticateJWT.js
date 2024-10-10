@@ -12,7 +12,8 @@ const authenticateToken = (req, res, next) => {
     jwt.verify(token, jwt_secret, (err, decoded) => {
         if (err) return res.status(403).json({ message: 'Invalid Access Token' });
 
-        req.user = decoded; // ข้อมูล user จะถูก decode จาก token
+        req.user = decoded;
+        console.log("req.user: ", req.user); // ข้อมูล user จะถูก decode จาก token
         next();
     });
 };
@@ -20,7 +21,6 @@ const authenticateToken = (req, res, next) => {
 const authorizeRole = (allowedRoles) => {
     return (req, res, next) => {
         const userRole = req.user.role; // ดึง role จาก req.user
-
         // ตรวจสอบว่า userRole มีอยู่ใน allowedRoles หรือไม่
         if (!allowedRoles.includes(userRole)) {
             return res.status(403).json({ message: 'Access denied' }); // ไม่อนุญาตให้เข้าถึง
