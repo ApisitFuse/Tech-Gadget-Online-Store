@@ -4,9 +4,8 @@ require('dotenv').config();
 const jwt_secret = process.env.JWT_SECRET;
 
 const authenticateToken = (req, res, next) => {
-    const token = req.cookies.accessToken; // ดึง access token จาก cookie
+    const token = req.cookies.accessToken;
 
-    console.log("token from cookie: ", token);
     if (!token) return res.status(401).json({ message: 'Access Token required' });
 
     jwt.verify(token, jwt_secret, (err, decoded) => {
@@ -28,31 +27,6 @@ const authorizeRole = (allowedRoles) => {
         next(); // อนุญาตให้ผ่านไปยัง route ถัดไป
     };
 };
-
-// const loginVerify = (req, res, next) => {
-//     // const token = req.headers['authorization'];
-//     const token = req.headers['authorization']?.split(' ')[1];
-//     console.log(token);
-
-//     if (!token) {
-//         console.log("Don't have token");
-//         return res.sendStatus(403);
-//     }
-
-//     if (token) {
-//         jwt.verify(token, secretKey, (err, user) => {
-//             if (err) {
-//                 console.log(err);
-//                 return res.sendStatus(403); // Forbidden
-//             }
-//             req.user = user; // เก็บข้อมูลผู้ใช้ใน req.user
-//             next(); // ไปยัง middleware ถัดไป
-//         });
-//     } else {
-//         res.sendStatus(401); // Unauthorized
-//     }
-// };
-
 
 
 module.exports = {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Seller = () => {
+const SellerPage = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-lg max-w-md text-center">
@@ -19,4 +19,4 @@ const Seller = () => {
     );
 };
 
-export default Seller;
+export default SellerPage;

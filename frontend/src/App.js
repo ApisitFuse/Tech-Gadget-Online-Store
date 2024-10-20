@@ -9,11 +9,16 @@ import Unauthorized from './error/Unauthorized';
 import SuperAdmin from './super_admin/SuperAdmin';
 import Admin from './admin/Admin';
 import Seller from './seller/Seller';
+import Customer from './customer/Customer';
 import { fetchCheckAuthAPI } from './services/authenticationService';
 import "./tailwind.css";
 
 // สร้าง PrivateRoute component เพื่อป้องกันการเข้าถึงเส้นทาง
 const PrivateRoute = ({ element: Component, allowedRoles, userRole }) => {
+  if (!userRole) {
+    console.log('Loading user role...');
+    return <div>Loading...</div>;  // รอจนกว่าจะได้ค่า userRole
+  }
   return allowedRoles.includes(userRole) ? (
     Component
   ) : (
@@ -25,7 +30,6 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [authStatus, setAuthStatus] = useState(null);
-  // const navigate = useNavigate();
 
 
   // ตรวจสอบการ login ทุกครั้งที่ component นี้ render
@@ -35,14 +39,16 @@ const App = () => {
         const response = await fetchCheckAuthAPI();
 
         if (response.status === 403) {
-          console.log("Access token expired, attempting to refresh...");
+          console.log("Invalid Access Token");
           setAuthStatus(response.status);
-        } else {
+        } else if (response.status === 200) {
           const data = await response.json();
           setUserRole(data.user.role);
           if (data.isLoggedIn) {
             setIsLoggedIn(true);
           }
+        } else {
+          console.error('Some error occur during checking authentication:', response.statusText);
         }
       } catch (error) {
         console.error('Error checking authentication:', error);
@@ -50,25 +56,23 @@ const App = () => {
     };
 
     checkAuth();
-  }, [isLoggedIn]); // ลบ isLoggedIn และ authStatus ออกจาก dependencies
+  }, [isLoggedIn]);
 
   // การนำทางถ้า authStatus เป็น 403
   useEffect(() => {
     if (authStatus === 403) {
       console.log("authStatus", authStatus);
-      // navigate('/login'); // ใช้ navigate ที่นี่
-      // window.location.href = '/login';
     }
   }, [authStatus]);
 
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
-        <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} userRole={userRole} />
+        <Navigation isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} userRole={userRole} setUserRole={setUserRole}/>
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
-          <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} />} />
-          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+          <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
+          <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
           <Route path="/profile" element={<Profile />} />
 
           {/* ตัวอย่างการใช้ PrivateRoute กับหน้า Super Admin */}
@@ -78,11 +82,15 @@ const App = () => {
           />
           <Route
             path="/admin"
-            element={<PrivateRoute allowedRoles={['Admin']} userRole={userRole} element={<Admin />} />}
+            element={<PrivateRoute allowedRoles={['Super Admin', 'Admin']} userRole={userRole} element={<Admin />} />}
           />
           <Route
             path="/seller"
-            element={<PrivateRoute allowedRoles={['Seller']} userRole={userRole} element={<Seller />} />}
+            element={<PrivateRoute allowedRoles={['Super Admin', 'Seller']} userRole={userRole} element={<Seller />} />}
+          />
+          <Route
+            path="/customer"
+            element={<PrivateRoute allowedRoles={['Super Admin', 'Customer']} userRole={userRole} element={<Customer />} />}
           />
 
           {/* หน้า Unauthorized สำหรับผู้ที่ไม่มีสิทธิ์ */}

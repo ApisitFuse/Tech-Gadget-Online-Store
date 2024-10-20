@@ -19,11 +19,12 @@ export const fetchLoginAPI = async (email, password) => {
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            console.error('Network response was not ok');
+            return response;
         }
 
-        const result = await response.json();
-        return result;
+        // const result = await response.json();
+        return response;
 
     } catch (error) {
         console.error('Error during login:', error);
@@ -31,7 +32,7 @@ export const fetchLoginAPI = async (email, password) => {
     }
 };
 
-export const fetchRegisterAPI = async (GID, globalName, email, password, roleId) => {
+export const fetchRegisterAPI = async (GID, globalName, email, password, confirmPassword, roleId) => {
     try {
         const response = await fetch(`http://${HOST}:${PORT}/api/auth/register`, {
             method: 'POST',
@@ -39,15 +40,16 @@ export const fetchRegisterAPI = async (GID, globalName, email, password, roleId)
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ GID, globalName, email, password, roleId }),
+            body: JSON.stringify({ GID, globalName, email, password, confirmPassword, roleId }),
         });
 
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            console.error('Network response was not ok');
+            return response;
         }
 
-        const result = await response.json();
-        return result;
+        // const result = await response.json();
+        return response;
 
     } catch (error) {
         console.error('Error during login:', error);
