@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Register from './login/Register';
+import AdminRegister from './login/AdminRegister';
 import Login from './login/Login';
 import Profile from './user/Profile';
 import Home from './general/Home';
 import Navigation from './layout/Navigation';
 import Unauthorized from './error/Unauthorized';
 import SuperAdmin from './super_admin/SuperAdmin';
+import SendEmailToken from './super_admin/SendEmailToken';
 import Admin from './admin/Admin';
 import Seller from './seller/Seller';
 import Customer from './customer/Customer';
@@ -72,6 +74,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/register" element={<Register setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
+          <Route path="/admin_register" element={<AdminRegister setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} setUserRole={setUserRole}/>} />
           <Route path="/profile" element={<Profile />} />
 
@@ -79,6 +82,10 @@ const App = () => {
           <Route
             path="/super_admin"
             element={<PrivateRoute allowedRoles={['Super Admin']} userRole={userRole} element={<SuperAdmin />} />}
+          />
+          <Route
+            path="/super_admin_send_email_token"
+            element={<PrivateRoute allowedRoles={['Super Admin']} userRole={userRole} element={<SendEmailToken />} />}
           />
           <Route
             path="/admin"

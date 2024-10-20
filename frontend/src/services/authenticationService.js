@@ -5,7 +5,6 @@ const PORT = process.env.REACT_APP_BN_PORT;
 
 export const fetchLoginAPI = async (email, password) => {
     try {
-        console.log(`Login: ${email}, ${password}`);
         const response = await fetch(`http://${HOST}:${PORT}/api/auth/login`, {
             method: 'POST',
             credentials: 'include',
@@ -41,6 +40,31 @@ export const fetchRegisterAPI = async (GID, globalName, email, password, confirm
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ GID, globalName, email, password, confirmPassword, roleId }),
+        });
+
+        if (!response.ok) {
+            console.error('Network response was not ok');
+            return response;
+        }
+
+        // const result = await response.json();
+        return response;
+
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw error;
+    }
+};
+
+export const fetchAdminRegisterAPI = async (token, GID, globalName, email, password, confirmPassword, roleId) => {
+    try {
+        const response = await fetch(`http://${HOST}:${PORT}/api/auth/admin_register`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token, GID, globalName, email, password, confirmPassword, roleId }),
         });
 
         if (!response.ok) {

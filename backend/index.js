@@ -11,6 +11,7 @@ const { Order } = require("./models/Admin");
 const { Search, Recomment } = require("./models/RecommentSearch");
 const authRoutes = require('./controllers/Authenticate');
 const userRoutes = require('./controllers/User');
+const emailRoutes = require('./controllers/Email');
 const seedData = require('./seedData/Seed');
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -40,6 +41,7 @@ app.use(
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/email', emailRoutes);
 // // Middleware ให้บริการไฟล์จากโฟลเดอร์ uploads
 // app.use('/uploads', express.static('uploads'));
 // กำหนด static folder
