@@ -14,6 +14,7 @@ const userRoutes = require('./controllers/User');
 const seedData = require('./seedData/Seed');
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 require("dotenv").config();
 
@@ -39,8 +40,10 @@ app.use(
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
-// Middleware ให้บริการไฟล์จากโฟลเดอร์ uploads
-app.use('/uploads', express.static('uploads'));
+// // Middleware ให้บริการไฟล์จากโฟลเดอร์ uploads
+// app.use('/uploads', express.static('uploads'));
+// กำหนด static folder
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API เพื่อดึงข้อมูล Users
 app.get('/api/users', async (req, res) => {

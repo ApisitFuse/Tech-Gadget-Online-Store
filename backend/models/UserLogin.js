@@ -71,7 +71,7 @@ class Registration extends Model { }
 Registration.init({
   GID: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   globalName: {
     type: DataTypes.STRING,
@@ -93,7 +93,7 @@ Registration.init({
       model: Role,
       key: 'id',
     },
-    allowNull: true,
+    allowNull: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   },

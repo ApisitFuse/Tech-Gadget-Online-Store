@@ -65,6 +65,13 @@ const Home = ({ isLoggedIn }) => {
           <p className="mt-2 text-gray-600">This content is visible only to Sellers.</p>
         </div>
       </RoleBasedComponent>
+
+      <RoleBasedComponent allowedRoles={['Customer']} userRole={userRole}>
+        <div className="mt-8 bg-blue-100 p-4 rounded shadow-lg">
+          <h2 className="text-2xl font-semibold">Customer Content</h2>
+          <p className="mt-2 text-gray-600">This content is visible only to Customers.</p>
+        </div>
+      </RoleBasedComponent>
     </div>
   );
 };
