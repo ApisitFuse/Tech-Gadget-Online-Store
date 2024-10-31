@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const sequelize = require("./config/Database");
-const { User, Role, Delivery_status, Address, Gender, Registration, Status } = require("./models/UserLogin");
+const { User, Role, Delivery_status, Address, Gender, Registration, Status, Token } = require("./models/UserLogin");
 const { Product, Category, Promotion_type, Promotion, ProductPromotion, CategoryProduct } = require("./models/Product");
 const { Cart } = require("./models/Shopping");
 const { Wishlist } = require("./models/Wishlist");
@@ -16,6 +16,8 @@ const seedData = require('./seedData/Seed');
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const { Sequelize } = require('sequelize');
+const cron = require('node-cron');
 
 require("dotenv").config();
 
@@ -82,6 +84,28 @@ const startServer = async () => {
 
 // เริ่มเซิร์ฟ เกี่ยวกับการสร้างตาราง
 // startServer();
+
+const deleteExpiredTokens = async () => {
+  const now = new Date();
+  try {
+      const result = await Token.destroy({
+          where: {
+              expiresAt: {
+                  [Sequelize.Op.lt]: now, // หาทุกเรคคอร์ดที่หมดอายุ
+              },
+          },
+      });
+      console.log(`Deleted ${result} expired tokens.`);
+  } catch (error) {
+      console.error('Error deleting expired tokens:', error);
+  }
+};
+
+// ตั้งค่าให้ลบ token ทุกชั่วโมง
+cron.schedule('* * * * *', () => {
+  console.log('Running scheduled task to delete expired tokens...');
+  deleteExpiredTokens();
+});
 
 app.listen(B_PORT, () => {
   console.log(`Server is running on http://localhost:${B_PORT}`);

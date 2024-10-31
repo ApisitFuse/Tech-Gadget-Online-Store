@@ -8,7 +8,6 @@ const Register = ({ setIsLoggedIn, setUserRole }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [roleId, setRoleId] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
 
@@ -19,7 +18,7 @@ const Register = ({ setIsLoggedIn, setUserRole }) => {
         setErrors({});
 
         try {
-            const response = await fetchRegisterAPI(GID, globalName, email, password, confirmPassword, roleId);
+            const response = await fetchRegisterAPI(GID, globalName, email, password, confirmPassword);
 
             const data = await response.json();
 
@@ -119,7 +118,7 @@ const Register = ({ setIsLoggedIn, setUserRole }) => {
                         {errors.confirmPassword && <p className="text-red-600 text-sm mt-1">{errors.confirmPassword}</p>}
                     </div>
 
-                    <div className="mb-4">
+                    {/* <div className="mb-4">
                         <input
                             type="number"
                             placeholder="Role ID"
@@ -130,7 +129,7 @@ const Register = ({ setIsLoggedIn, setUserRole }) => {
                         {errors.roleId && (
                             <p className="text-red-600 text-sm mt-1">{errors.roleId}</p>
                         )}
-                    </div>
+                    </div> */}
 
                     <button
                         type="submit"

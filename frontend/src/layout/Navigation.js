@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { fetchLogoutAPI } from '../services/authenticationService';
 import { fetchUserProfileAPI } from '../services/User';
 import RoleBasedComponent from '../layout/RoleBased';
-
+import { FaUser } from 'react-icons/fa';
 
 const Navigation = ({ isLoggedIn, setIsLoggedIn, userRole, setUserRole }) => {
   const navigate = useNavigate();
@@ -11,8 +11,6 @@ const Navigation = ({ isLoggedIn, setIsLoggedIn, userRole, setUserRole }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
-    console.log(isLoggedIn);
-    console.log(userRole);
 
     const fetchUser = async () => {
       try {
@@ -111,17 +109,23 @@ const Navigation = ({ isLoggedIn, setIsLoggedIn, userRole, setUserRole }) => {
             <div className="flex items-center space-x-4">
               <h2 className="text-white">{user.email}</h2>
               <div className="relative">
-                <img
-                  src={`http://localhost:8000/uploads/profile/${user.profileImage}`}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full object-cover cursor-pointer"
-                  onClick={toggleDropdown}
-                />
+                {user.profileImage ? (
+                  <img
+                    src={`http://localhost:8000/uploads/profile/${user.profileImage}`}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full object-cover cursor-pointer"
+                    onClick={toggleDropdown}
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center bg-gray-100 cursor-pointer" onClick={toggleDropdown}>
+                    <FaUser className="text-gray-400 text-xl" />
+                  </div>
+                )}
                 {/* Dropdown Menu */}
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10">
                     <a href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">View Profile</a>
-                    <a href="/settings" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Settings</a>
+                    <a href="/change_password" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Change Password</a>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left block px-4 py-2 text-gray-700 hover:bg-gray-100"
