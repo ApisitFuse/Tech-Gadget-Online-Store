@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const AdminPage = () => {
     return (
@@ -8,12 +9,12 @@ const AdminPage = () => {
                 <p className="text-gray-700 mb-6">
                     Welcome to the admin page! Only admins can see this.
                 </p>
-                <a 
-                    href="/"
-                    className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                <Link
+                    to="/admin_send_email_token"
+                    className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-200 shadow-lg"
                 >
-                    Go to Home
-                </a>
+                    Send Email Token
+                </Link>
             </div>
         </div>
     );

@@ -31,7 +31,7 @@ export const fetchLoginAPI = async (email, password) => {
     }
 };
 
-export const fetchRegisterAPI = async (GID, globalName, email, password, confirmPassword, roleId) => {
+export const fetchRegisterAPI = async (GID, globalName, email, password, confirmPassword) => {
     try {
         const response = await fetch(`http://${HOST}:${PORT}/api/auth/register`, {
             method: 'POST',
@@ -39,7 +39,7 @@ export const fetchRegisterAPI = async (GID, globalName, email, password, confirm
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ GID, globalName, email, password, confirmPassword, roleId }),
+            body: JSON.stringify({ GID, globalName, email, password, confirmPassword }),
         });
 
         if (!response.ok) {
@@ -47,7 +47,6 @@ export const fetchRegisterAPI = async (GID, globalName, email, password, confirm
             return response;
         }
 
-        // const result = await response.json();
         return response;
 
     } catch (error) {
@@ -56,7 +55,7 @@ export const fetchRegisterAPI = async (GID, globalName, email, password, confirm
     }
 };
 
-export const fetchAdminRegisterAPI = async (token, GID, globalName, email, password, confirmPassword, roleId) => {
+export const fetchAdminRegisterAPI = async (token, GID, globalName, email, password, confirmPassword) => {
     try {
         const response = await fetch(`http://${HOST}:${PORT}/api/auth/admin_register`, {
             method: 'POST',
@@ -64,7 +63,7 @@ export const fetchAdminRegisterAPI = async (token, GID, globalName, email, passw
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ token, GID, globalName, email, password, confirmPassword, roleId }),
+            body: JSON.stringify({ token, GID, globalName, email, password, confirmPassword }),
         });
 
         if (!response.ok) {
@@ -80,6 +79,78 @@ export const fetchAdminRegisterAPI = async (token, GID, globalName, email, passw
         throw error;
     }
 };
+
+export const fetchSellerRegisterAPI = async (token, GID, globalName, email, password, confirmPassword) => {
+    try {
+        const response = await fetch(`http://${HOST}:${PORT}/api/auth/seller_register`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token, GID, globalName, email, password, confirmPassword }),
+        });
+
+        if (!response.ok) {
+            console.error('Network response was not ok');
+            return response;
+        }
+
+        // const result = await response.json();
+        return response;
+
+    } catch (error) {
+        console.error('Error during login:', error);
+        throw error;
+    }
+};
+
+export const fetchChangePasswordAPI = async (oldPassword, newPassword, confirmNewPassword) => {
+    try {
+        const response = await fetch(`http://${HOST}:${PORT}/api/auth/change_password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ oldPassword, newPassword, confirmNewPassword }),
+        });
+
+        // ตรวจสอบว่า response ok หรือไม่
+        if (!response.ok) {
+            // ถ้าสถานะ 401 หมายถึง access token หมดอายุ
+            if (response.status === 401) {
+                console.log("Access token expired, attempting to refresh...");
+
+                const refreshResponse = await fetchRefreshTokenAPI();
+
+                if (refreshResponse.ok) {
+                    
+                    console.log("Access token refreshed successfully, retrying change password fetch...");
+                    return await fetch(`http://${HOST}:${PORT}/api/auth/change_password`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({ oldPassword, newPassword, confirmNewPassword }),
+                    });
+                } else {
+                    console.error('Failed to refresh token');
+                    return response;
+                }
+            } else {
+                console.error('Network response was not ok');
+                return response;
+            }
+        }
+
+        return response;
+    } catch (error) {
+        console.error('Error during fetching change password:', error);
+        throw error;
+    }
+}
 
 export const fetchLogoutAPI = async () => {
     try {
@@ -129,6 +200,30 @@ export const fetchRefreshTokenAPI = async () => {
     }
 
 }
+export const fetchRequestTokenAPI = async (email) => {
+    try {
+
+        const response = await fetch(`http://${HOST}:${PORT}/api/auth/request_token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+
+        // ตรวจสอบ response status code และจัดการกับสถานะที่ไม่ใช่ 2xx
+        if (!response.ok) {
+            console.error('Network response was not ok');
+            return response;
+        }
+        
+        return response;
+
+    } catch (error) {
+        console.error('Error during get token:', error);
+        throw error;
+    }
+
+
+}
 
 export const fetchCheckAuthAPI = async () => {
     try {
@@ -155,9 +250,9 @@ export const fetchCheckAuthAPI = async () => {
                         method: 'GET',
                         credentials: 'include',
                     });
-                } else if(refreshResponse.status === 403) {
+                } else if (refreshResponse.status === 403) {
                     return refreshResponse;
-                }else {
+                } else {
                     throw new Error('Failed to refresh token');
                 }
             } else {

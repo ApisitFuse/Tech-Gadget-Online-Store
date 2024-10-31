@@ -66,6 +66,43 @@ Gender.init({
   schema: 'tech_gadget_online_store',
 });
 
+
+class Token extends Model { }
+
+Token.init({
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  token: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  roleId: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Role,
+      key: 'id',
+    },
+    allowNull: false,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  },
+  expiresAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+  }
+  
+}, {
+  sequelize,
+  modelName: 'Token',
+  tableName: 'tokens',
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: false,
+  schema: 'tech_gadget_online_store',
+});
+
 class Registration extends Model { }
 
 Registration.init({
@@ -244,6 +281,9 @@ User.belongsTo(Registration, { foreignKey: 'registrationId' });  // Profile เน€เ
 Role.hasMany(Registration, { foreignKey: 'roleId' });
 Registration.belongsTo(Role, { foreignKey: 'roleId' });
 
+Role.hasMany(Token, { foreignKey: 'roleId' });
+Token.belongsTo(Role, { foreignKey: 'roleId' });
+
 Gender.hasMany(User, { foreignKey: 'genderId' });
 User.belongsTo(Gender, { foreignKey: 'genderId' });
 
@@ -253,4 +293,4 @@ Address.belongsTo(User, { foreignKey: 'userId' });
 Status.belongsToMany(User, { through: Delivery_status, foreignKey: 'statusId' });
 User.belongsToMany(Status, { through: Delivery_status, foreignKey: 'userId' });
 
-module.exports = { User, Role, Delivery_status, Address, Gender, Registration, Status };
+module.exports = { User, Role, Delivery_status, Address, Gender, Registration, Status, Token };

@@ -1,34 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { fetchAdminRegisterAPI } from '../services/authenticationService';
+import { fetchAdminRegisterAPI, fetchRequestTokenAPI } from '../services/authenticationService';
+import { fetchDecryptEmailAPI } from '../services/SendEmail';
 
 const AdminRegisterPage = ({ setIsLoggedIn, setUserRole }) => {
-    const [error, setError] = useState('');
-    const location = useLocation();
     const [GID, setGID] = useState('');
     const [globalName, setGlobalName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    // const [roleId, setRoleId] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
-    const token = new URLSearchParams(location.search).get('token');
+    const [token, setToken] = useState('');
+    const [decryptedEmail, setDecryptedEmail] = useState('');
 
+    const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token) {
-            setError('Token not found');
+        const queryParams = new URLSearchParams(location.search);
+        const encryptedEmail = queryParams.get('email'); // ดึง email ที่เข้ารหัสจาก query parameter
+
+        // ตรวจสอบว่า encodedEmail มีค่าอยู่หรือไม่
+        if (encryptedEmail) {
+            const fetchDecrypt = async () => {
+                try {
+                    const response = await fetchDecryptEmailAPI(encryptedEmail);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setDecryptedEmail(data.decryptedEmail);
+                    } else {
+                        console.error('Failed to retrieve email');
+                    }
+                } catch (error) {
+                    console.error('Error fetching decrypted email:', error);
+                }
+            };
+
+            fetchDecrypt();
         }
-    }, [token]);
+    }, [location.search]);
+
+    useEffect(() => {
+
+        if (decryptedEmail) {
+
+            // เมื่อผู้ใช้เข้าสู่หน้า เราจะส่ง request เพื่อขอ token
+            const fetchToken = async () => {
+                try {
+                    const response = await fetchRequestTokenAPI(decryptedEmail);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        setToken(data.token);
+                    } else {
+                        console.error('Failed to retrieve token');
+                    }
+                } catch (error) {
+                    console.error('Error fetching token:', error);
+                }
+            };
+
+            fetchToken();
+        }
+
+    }, [decryptedEmail]);
 
     const handleRegister = async (e) => {
         e.preventDefault();
         setErrors({});
 
         try {
-            const response = await fetchAdminRegisterAPI(token, GID, globalName, email, password, confirmPassword, 2);
+            const response = await fetchAdminRegisterAPI(token, GID, globalName, email, password, confirmPassword);
 
             const data = await response.json();
 
@@ -40,12 +83,16 @@ const AdminRegisterPage = ({ setIsLoggedIn, setUserRole }) => {
                 navigate('/admin');
 
             } else {
-                setErrors(data.errors.reduce((acc, err) => ({ ...acc, [err.path]: err.msg }), {}));
-                setMessage('Registration failed');
+                if (data.tokenCheck === "token not found") {
+                    setMessage(data.message);
+                } else {
+                    setErrors(data.errors.reduce((acc, err) => ({ ...acc, [err.path]: err.msg }), {}));
+                    setMessage('Registration failed');
+                }
                 return;
             }
         } catch (err) {
-            console.error('Error registering user:', error);
+            console.error('Error registering user:', err);
             setMessage('Error occurred');
         }
     };
@@ -53,8 +100,7 @@ const AdminRegisterPage = ({ setIsLoggedIn, setUserRole }) => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-                {error && <p>{error}</p>}
-                <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
+                <h2 className="text-2xl font-bold text-center mb-6">Admin Register</h2>
                 <form onSubmit={handleRegister}>
                     <div className="mb-4">
                         <input
