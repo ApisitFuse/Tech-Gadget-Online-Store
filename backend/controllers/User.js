@@ -1,4 +1,4 @@
-const { authenticateToken, authorizeRole } = require('../middleware/AuthenticateJWT');
+const { authenticateToken, authorizeRole } = require('../middleware/authenticateJWT');
 const { Registration, User } = require('../models/UserLogin');  // Import User model
 const express = require('express');
 const router = express.Router();
