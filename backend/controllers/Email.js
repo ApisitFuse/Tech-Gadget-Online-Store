@@ -4,7 +4,7 @@ const router = express.Router();
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const { Token, Role } = require('../models/UserLogin');
-const { authenticateToken, authorizeRole } = require('../middleware/AuthenticateJWT');
+const { authenticateToken, authorizeRole } = require('../middleware/authenticateJWT');
 const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 

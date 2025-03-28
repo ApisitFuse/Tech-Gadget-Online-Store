@@ -12,6 +12,8 @@ const { Search, Recomment } = require("./models/RecommentSearch");
 const authRoutes = require('./controllers/Authenticate');
 const userRoutes = require('./controllers/User');
 const emailRoutes = require('./controllers/Email');
+const imageRoutes = require('./controllers/Image');
+const productRoutes = require('./controllers/Product');
 const seedData = require('./seedData/Seed');
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -30,6 +32,10 @@ const F_PORT = process.env.FN_PORT;
 app.use(express.json());
 app.use(cookieParser());
 
+//เผื่อเอาไว้เพิ่มขนาดของ request
+// app.use(express.json({ limit: "10mb" }));
+// app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 // CORS setup
 app.use(
   cors({
@@ -44,6 +50,8 @@ app.use(
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/image', imageRoutes);
+app.use('/api/product', productRoutes);
 // // Middleware ให้บริการไฟล์จากโฟลเดอร์ uploads
 // app.use('/uploads', express.static('uploads'));
 // กำหนด static folder

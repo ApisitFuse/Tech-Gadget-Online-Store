@@ -15,6 +15,9 @@ import AdminSendEmailToken from './admin/AdminSendEmailToken';
 import Admin from './admin/Admin';
 import Seller from './seller/Seller';
 import Customer from './customer/Customer';
+import Image from './product/UploadImage';
+import AddProduct from './product/AddProduct';
+import TableProduct from './product/TableProduct';
 import { fetchCheckAuthAPI } from './services/authenticationService';
 import "./tailwind.css";
 
@@ -92,6 +95,18 @@ const App = () => {
           <Route
             path="/super_admin"
             element={<PrivateRoute allowedRoles={['Super Admin']} userRole={userRole} element={<SuperAdmin />} isLoggedIn={isLoggedIn} />}
+          />
+          <Route
+            path="/up_product_image"
+            element={<PrivateRoute allowedRoles={['Super Admin', 'Admin', 'Seller',]} userRole={userRole} element={<Image />} isLoggedIn={isLoggedIn} />}
+          />
+          <Route
+            path="/add_product"
+            element={<PrivateRoute allowedRoles={['Seller',]} userRole={userRole} element={<AddProduct />} isLoggedIn={isLoggedIn} />}
+          />
+          <Route
+            path="/table_product"
+            element={<PrivateRoute allowedRoles={['Seller',]} userRole={userRole} element={<TableProduct />} isLoggedIn={isLoggedIn} />}
           />
           <Route
             path="/super_admin_send_email_token"

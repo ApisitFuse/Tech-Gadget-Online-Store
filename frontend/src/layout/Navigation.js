@@ -98,6 +98,12 @@ const Navigation = ({ isLoggedIn, setIsLoggedIn, userRole, setUserRole }) => {
           )}
 
           {isLoggedIn && (
+            <li>
+              <Link to="/up_product_image" className="text-white hover:bg-blue-500 px-4 py-2 rounded transition duration-300">Upload product image</Link>
+            </li>
+          )}
+
+          {isLoggedIn && (
             <button onClick={handleLogout} className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition duration-200">
               Logout
             </button>

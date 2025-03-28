@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const SellerPage = () => {
@@ -8,12 +9,26 @@ const SellerPage = () => {
                 <p className="text-gray-700 mb-6">
                     Welcome to the seller page! Only sellers can see this.
                 </p>
-                <a 
-                    href="/"
-                    className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
-                >
-                    Go to Home
-                </a>
+                <div className="flex justify-center space-x-4">
+                    <a
+                        href="/"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                    >
+                        Go to Home
+                    </a>
+                    <a
+                        href="/add_product"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                    >
+                        Add Product
+                    </a>
+                    <a
+                        href="/table_product"
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-200"
+                    >
+                        Show Product
+                    </a>
+                </div>
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ const authenticateToken = (req, res, next) => {
         if (err) return res.status(403).json({ message: 'Invalid Access Token' });
 
         req.user = decoded;
-        console.log("req.user: ", req.user); // ข้อมูล user จะถูก decode จาก token
+        console.log("req.user: ", req.user);
         next();
     });
 };
@@ -24,6 +24,7 @@ const authorizeRole = (allowedRoles) => {
         if (!allowedRoles.includes(userRole)) {
             return res.status(403).json({ message: 'Access denied' }); // ไม่อนุญาตให้เข้าถึง
         }
+
         next(); // อนุญาตให้ผ่านไปยัง route ถัดไป
     };
 };
