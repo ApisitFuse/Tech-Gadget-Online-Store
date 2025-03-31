@@ -164,7 +164,7 @@ CategoryProduct.init(
         productId: {
             type: DataTypes.INTEGER,
             references: {
-                model: Promotion,
+                model: Category,
                 key: "id",
             },
             allowNull: false,

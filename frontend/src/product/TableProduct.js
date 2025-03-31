@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { fetchProductsAPI, deleteProductAPI, updateProductAPI } from "../services/Product";
+import { fetchProductsAPI, deleteProductAPI, updateProductAPI, fetchCategoriesAPI } from "../services/Product";
 import { LoadingModal, SuccessModal, ConfirmDeleteModal, ImageModal } from "../layout/Modal";
 import { useDropzone } from "react-dropzone";
 import { fetchUploadImageAPI } from '../services/Image';
+import { Link } from "react-router-dom";
+import Select from "react-select";
+// import { FaPlus } from 'react-icons/fa';
 
 
 export default function ProductManagement() {
@@ -14,9 +17,11 @@ export default function ProductManagement() {
     const [isSuccess, setIsSuccess] = useState(true);
     const [message, setMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false); // สถานะเปิด/ปิดของ ConfirmModal
-    const [productToDelete, setProductToDelete] = useState(null);  // เก็บสินค้าที่จะลบ
+    const [isConfirmDeleteModalOpen, setIsConfirmDeleteModalOpen] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
     const [errors, setErrors] = useState({});
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [product, setProduct] = useState({
         id: 0,
         productImage: "",
@@ -24,6 +29,9 @@ export default function ProductManagement() {
         description: "",
         price: "",
         stock: 0,
+        Categories: []
+        // categories: selectedCategories,
+
     });
     const [imagePreview, setImagePreview] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
@@ -46,6 +54,26 @@ export default function ProductManagement() {
         }
     }, [selectedFile]);
 
+    useEffect(() => {
+        const loadCategories = async () => {
+            const response = await fetchCategoriesAPI();
+            const data = await response.json();
+            setCategories(data.map(cat => ({ value: cat.id, label: cat.name })));
+        };
+        loadCategories();
+    }, []);
+
+    // เมื่อเปิด Modal ให้โหลดค่าหมวดหมู่ของสินค้ามาแสดง
+    useEffect(() => {
+        if (product.Categories.length > 0 && categories.length > 0) {
+            // หา category ที่ตรงกับ product.categories
+            const categoryIds = product.Categories.map(cat => cat.id);
+            const preselected = categories.filter(cat => categoryIds.includes(cat.value));
+
+            setSelectedCategories(preselected);
+        }
+    }, [product.Categories, categories]); // ใช้ useEffect เมื่อ product หรือ categories เปลี่ยนค่า
+
     const onDrop = (acceptedFiles) => {
         if (acceptedFiles.length > 0) {
             const file = acceptedFiles[0];
@@ -67,6 +95,7 @@ export default function ProductManagement() {
             const response = await fetchProductsAPI();
             const data = await response.json();
             setProducts(data);
+            console.log("Products:", data);
         } catch (error) {
             console.error("Error fetching products:", error);
         } finally {
@@ -101,6 +130,14 @@ export default function ProductManagement() {
 
     const cancelDelete = () => {
         setIsConfirmDeleteModalOpen(false);  // ปิด ConfirmModal
+    };
+
+    const handleCategoryChange = (selected) => {
+        setSelectedCategories(selected);
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            categories: selected ? selected.map(option => option.value) : [], // เก็บแค่ categoryId
+        }));
     };
 
     const handleEdit = (product) => {
@@ -160,6 +197,7 @@ export default function ProductManagement() {
     };
 
     const handleCancel = () => {
+        setSelectedCategories([]);
         setSelectedFile(null);
         setImagePreview(product.image); // เซ็ตกลับไปที่รูปของ product เอง
         setIsEditModalOpen(false);
@@ -175,7 +213,7 @@ export default function ProductManagement() {
         const matchesProductName = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesPrice = product.price.toString().includes(searchTerm);
         const matchesStock = product.stock.toString().includes(searchTerm);
-    
+
         // คืนค่าผลลัพธ์ที่ตรงกับเงื่อนไขใดๆ จากทั้ง 3 ฟิลด์
         return matchesProductName || matchesPrice || matchesStock;
     });
@@ -185,23 +223,59 @@ export default function ProductManagement() {
             <h2 className="text-2xl font-bold mb-4">จัดการสินค้า</h2>
 
             {/* ค้นหาสินค้า */}
-            <input
-                type="text"
-                placeholder="ค้นหาสินค้า..."
-                className="w-full p-2 border border-gray-300 rounded mb-4"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex items-center mb-4">
+                <input
+                    type="text"
+                    placeholder="ค้นหาสินค้า..."
+                    className="w-full p-2 mr-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <Link
+                    to="/add_product"
+                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 flex-shrink-0"
+                >
+                    เพิ่มสินค้า
+                </Link>
+            </div>
 
             {/* ตารางสินค้า */}
             <table className="w-full border-collapse border border-gray-200">
                 <thead>
-                    <tr className="bg-gray-100">
+                    {/* <tr className="bg-gray-100">
                         <th className="border p-2">รูป</th>
                         <th className="border p-2">ชื่อสินค้า</th>
                         <th className="border p-2">ราคา</th>
                         <th className="border p-2">จำนวน</th>
+                        <th className="border p-2 flex items-center justify-between">
+                            หมวดหมู่
+                            <Link
+                                to="/add_category"
+                                className="ml-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-blue-600"
+                            >
+                                +
+                            </Link>
+                        </th>
                         <th className="border p-2">จัดการ</th>
+                    </tr> */}
+
+                    <tr className="bg-gray-100 text-gray-700">
+                        <th className="border px-4 py-2">รูป</th>
+                        <th className="border px-4 py-2">ชื่อสินค้า</th>
+                        <th className="border px-4 py-2">ราคา</th>
+                        <th className="border px-4 py-2">จำนวน</th>
+                        <th className="border px-4 py-2 flex items-center justify-center">
+                            หมวดหมู่
+                            <Link
+                                to="/add_category"
+                                className="ml-2 bg-blue-500 text-white rounded-lg px-2 py-1 text-sm font-bold shadow-md hover:bg-blue-600 transition-all"
+                                // className="ml-2 bg-blue-500 text-white rounded-lg px-2 py-1 text-sm font-bold shadow-md hover:bg-blue-600 transition-all flex items-center"
+                            >
+                                +
+                                {/* <i className="fas fa-plus mr-2"></i> */}
+                            </Link>
+                        </th>
+                        <th className="border px-4 py-2">จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,6 +291,9 @@ export default function ProductManagement() {
                             <td className="border p-2">{product.productName}</td>
                             <td className="border p-2">{product.price} บาท</td>
                             <td className="border p-2">{product.stock}</td>
+                            <td className="border p-2">
+                                {product.Categories?.map(cat => cat.name).join(', ') || '-'}
+                            </td>
                             <td className="border p-2 space-x-2">
                                 <button
                                     className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
@@ -303,7 +380,30 @@ export default function ProductManagement() {
                             value={selectedProduct.stock}
                             onChange={(e) => setSelectedProduct({ ...selectedProduct, stock: e.target.value })}
                         />
-                        <div className="flex justify-end space-x-2">
+
+                        <Select
+                            isMulti
+                            options={categories} // หมวดหมู่ทั้งหมด
+                            value={selectedCategories} // หมวดหมู่ที่ถูกเลือก
+                            onChange={handleCategoryChange}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                            placeholder="เลือกหมวดหมู่สินค้า..."
+                            closeMenuOnSelect={false}
+                            // menuPlacement="auto"
+                            // menuPortalTarget={document.body}
+                            styles={{
+                                menuPortal: base => ({ ...base, zIndex: 9999 }),
+                                menu: base => ({
+                                    ...base,
+                                    maxHeight: "120px", // กำหนดความสูงสูงสุดของ dropdown
+                                    overflowY: "auto"  // เปิดให้ dropdown มี scrollbar
+                                })
+                            }}
+                            maxMenuHeight={120}
+                        />
+
+                        <div className="flex justify-end space-x-2 mt-2">
                             <button
                                 className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
                                 // onClick={() => setIsEditModalOpen(false)}
