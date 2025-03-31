@@ -17,6 +17,7 @@ import Seller from './seller/Seller';
 import Customer from './customer/Customer';
 import Image from './product/UploadImage';
 import AddProduct from './product/AddProduct';
+import AddCategory from './product/AddCategory';
 import TableProduct from './product/TableProduct';
 import { fetchCheckAuthAPI } from './services/authenticationService';
 import "./tailwind.css";
@@ -103,6 +104,10 @@ const App = () => {
           <Route
             path="/add_product"
             element={<PrivateRoute allowedRoles={['Seller',]} userRole={userRole} element={<AddProduct />} isLoggedIn={isLoggedIn} />}
+          />
+          <Route
+            path="/add_category"
+            element={<PrivateRoute allowedRoles={['Seller',]} userRole={userRole} element={<AddCategory />} isLoggedIn={isLoggedIn} />}
           />
           <Route
             path="/table_product"

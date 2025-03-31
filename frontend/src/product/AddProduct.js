@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
+import Select from "react-select";
+import { Link } from 'react-router-dom';
 import { fetchUploadImageAPI } from '../services/Image';
-import { fetchAddProductAPI } from '../services/Product';
+import { fetchAddProductAPI, fetchCategoriesAPI } from '../services/Product';
 import { SuccessModal, LoadingModal } from '../layout/Modal';
 
 export default function AddProductForm() {
@@ -12,12 +14,15 @@ export default function AddProductForm() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSuccess, setIsSuccess] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [product, setProduct] = useState({
         productImage: "",
         productName: "",
         description: "",
         price: "",
         stock: 0,
+        categories: selectedCategories,
         imagePreview: null,
     });
 
@@ -35,6 +40,15 @@ export default function AddProductForm() {
     };
 
     useEffect(() => {
+        const loadCategories = async () => {
+            const response = await fetchCategoriesAPI();
+            const data = await response.json();
+            setCategories(data.map(cat => ({ value: cat.id, label: cat.name })));
+        };
+        loadCategories();
+    }, []);
+
+    useEffect(() => {
         if (customFileName) {
             setProduct(prev => ({
                 ...prev,
@@ -49,16 +63,20 @@ export default function AddProductForm() {
         multiple: false
     });
 
-    // const handleUpload = async () => {
-    //     if (!selectedFile) return;
-
-    //     const formData = new FormData();
-    //     formData.append("image", selectedFile, customFileName);
-
-    //     const response = await fetchUploadImageAPI(formData);
-    //     const data = await response.json();
-    //     console.log("Image uploaded:", data);
+    // const handleCategoryChange = (selected) => {
+    //     setProduct((prevProduct) => ({
+    //         ...prevProduct,
+    //         categories: selected // selected คือลิสต์ของ categoryId ที่เลือก
+    //     }));
     // };
+
+    const handleCategoryChange = (selected) => {
+        setSelectedCategories(selected);
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            categories: selected ? selected.map(option => option.value) : [], // เก็บแค่ categoryId
+        }));
+    };
 
     const handleUpload = async (productId) => {
         if (!selectedFile) return;
@@ -102,6 +120,7 @@ export default function AddProductForm() {
         setIsLoading(true);
 
         try {
+
             const response = await fetchAddProductAPI(product);
             const data = await response.json();
 
@@ -117,8 +136,10 @@ export default function AddProductForm() {
                     description: "",
                     price: "",
                     stock: 0,
+                    categories: [],
                     imagePreview: null,
                 });
+                setSelectedCategories([]);
                 setSelectedFile(null);
                 setCustomFileName("");
 
@@ -191,13 +212,20 @@ export default function AddProductForm() {
                 </div>
 
                 {selectedFile && (
-                    <input
-                        type="text"
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        value={customFileName}
-                        onChange={(e) => setCustomFileName(e.target.value)}
-                        placeholder="เปลี่ยนชื่อไฟล์ (รวม .jpg .png เป็นต้น)"
-                    />
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            // className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.productImage ? 'border-b-2 border-b-red-600' : ''}`}
+                            value={customFileName}
+                            onChange={(e) => setCustomFileName(e.target.value)}
+                            placeholder="เปลี่ยนชื่อไฟล์ (รวม .jpg .png เป็นต้น)"
+                        />
+                        {errors.productImage && (
+                            <p className="text-red-600 text-sm mt-1">{errors.productImage}</p>
+                        )}
+                    </div>
+
                 )}
 
                 <div className="mb-4">
@@ -207,7 +235,8 @@ export default function AddProductForm() {
                         placeholder="ชื่อสินค้า"
                         // className="w-full p-3 border border-gray-300 rounded-md"
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.productName ? 'border-b-2 border-b-red-600' : ''}`}
-                        value={product.productName} onChange={handleChange}
+                        value={product.productName}
+                        onChange={handleChange}
                     />
                     {errors.productName && (
                         <p className="text-red-600 text-sm mt-1">{errors.productName}</p>
@@ -219,7 +248,8 @@ export default function AddProductForm() {
                         name="description"
                         placeholder="รายละเอียด"
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.description ? 'border-b-2 border-b-red-600' : ''}`}
-                        value={product.description} onChange={handleChange}
+                        value={product.description}
+                        onChange={handleChange}
                     />
                     {errors.description && (
                         <p className="text-red-600 text-sm mt-1">{errors.description}</p>
@@ -231,7 +261,8 @@ export default function AddProductForm() {
                         name="price"
                         placeholder="ราคา"
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.price ? 'border-b-2 border-b-red-600' : ''}`}
-                        value={product.price} onChange={handleChange}
+                        value={product.price}
+                        onChange={handleChange}
                     />
                     {errors.price && (
                         <p className="text-red-600 text-sm mt-1">{errors.price}</p>
@@ -243,16 +274,69 @@ export default function AddProductForm() {
                         name="stock"
                         placeholder="จำนวน"
                         className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.stock ? 'border-b-2 border-b-red-600' : ''}`}
-                        value={product.stock} onChange={handleChange}
+                        value={product.stock}
+                        onChange={handleChange}
                     />
                     {errors.stock && (
                         <p className="text-red-600 text-sm mt-1">{errors.stock}</p>
                     )}
                 </div>
 
-                <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">เพิ่มสินค้า</button>
+                <div className="mb-4">
+                    <Select
+                        isMulti
+                        options={categories}
+                        value={selectedCategories}
+                        onChange={handleCategoryChange}
+                        className="basic-multi-select"
+                        classNamePrefix="select"
+                        placeholder="เลือกหมวดหมู่สินค้า..."
+                    />
+
+                    {/* <Select
+                        isMulti
+                        options={categories} // ใช้ options ที่แปลงมา
+                        value={categoryOptions.filter(option => product.categories.includes(option.value))}
+                        onChange={handleCategoryChange}
+                        getOptionLabel={(e) => e.label}
+                        getOptionValue={(e) => e.value}
+                    /> */}
+                </div>
+
+                {/* <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">เพิ่มสินค้า</button> */}
+
+                <button
+                    type="submit"
+                    className="w-full p-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold shadow-md hover:from-blue-600 hover:to-blue-700 transition-all duration-300"
+                >
+                    เพิ่มสินค้า
+                </button>
+
+                <div className="mt-6 text-center">
+                    <Link
+                        to="/table_product"
+                        className="inline-flex items-center gap-2 text-blue-500 font-medium hover:text-blue-600 transition-all duration-300"
+                    >
+                        <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        ย้อนกลับ
+                    </Link>
+                </div>
             </form>
-            {/* {message && <p className="text-red-500 text-center mt-4">{message}</p>} */}
+
+            {/* <div className="mt-6 text-center">
+                <Link to="/table_product" className="w-full p-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                    ← ย้อนกลับ
+                </Link>
+            </div> */}
 
             <LoadingModal isOpen={isLoading} />
             <SuccessModal isOpen={isModalOpen} isSuccess={isSuccess} message={message} onClose={closeModal} />
